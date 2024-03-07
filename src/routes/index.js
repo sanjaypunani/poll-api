@@ -11,7 +11,7 @@ router.post("/login", authController.login);
 router.post("/poll", authenticateToken, pollController.createPoll);
 
 router.post("/poll", authenticateToken, pollController.createPoll);
-router.get("/poll/all", authenticateToken, pollController.getAllPoll);
+router.get("/poll/my", authenticateToken, pollController.getAllPoll);
 router.get("/poll/:id", authenticateToken, pollController.getPollbyId);
 
 router.post("/vote", authenticateToken, pollController.votePollItem);

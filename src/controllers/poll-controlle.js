@@ -33,6 +33,7 @@ const baseController = {
 
   getAllPoll: async (req, res) => {
     let query = [];
+    query.push({ $match: { creator: mongoose.Types.ObjectId(req.user.id) } });
     query.push({
       $lookup: {
         from: "pollitems",
