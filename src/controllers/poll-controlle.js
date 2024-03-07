@@ -1,4 +1,5 @@
 import Models from "../models";
+import mongoose from "mongoose";
 
 const baseController = {
   createPoll: async (req, res) => {
@@ -39,39 +40,31 @@ const baseController = {
       },
     });
 
-    //myLike
     query.push({
-      $addFields: {
-        myVote: {
-          $cond: {
-            if: {
-              $gt: [
-                {
-                  $size: {
-                    $filter: {
-                      input: "$myAction",
-                      as: "like",
-                      cond: {
-                        $and: [
-                          {
-                            $eq: [
-                              "$$like.action_user",
-                              mongoose.Types.ObjectId(req.user.id),
-                            ],
-                          },
-                          { $eq: ["$$like.action_type", "like"] },
-                        ],
-                      },
-                    },
-                  },
-                },
-                0,
-              ],
+      $lookup: {
+        from: "votes",
+        localField: "_id",
+        foreignField: "poll",
+        as: "allVotes",
+      },
+    });
+    query.push({
+      $lookup: {
+        from: "votes",
+        let: { poll: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$poll", "$$poll"] }, // Match votes with the same pollId
+                  { $eq: ["$voter", mongoose.Types.ObjectId(req.user.id)] }, // Replace "your_user_id" with the user ID you're interested in
+                ],
+              },
             },
-            then: true,
-            else: false,
           },
-        },
+        ],
+        as: "myVotes",
       },
     });
 
@@ -91,6 +84,17 @@ const baseController = {
       poll,
       pollItem,
     };
+    let query = {
+      voter: { $eq: req.user.id },
+      poll: { $eq: poll },
+    };
+    const alreadyVote = await Models.Votes.findOne(query);
+    if (alreadyVote) {
+      return res.status(412).send({
+        success: false,
+        message: "You already vote this poll",
+      });
+    }
     const newVote = new Models.Votes(voteData);
     newVote.save(async (saveErr, result) => {
       if (saveErr) {
