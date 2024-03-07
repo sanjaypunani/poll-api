@@ -19,11 +19,10 @@ export const CLIENT_SOCKET_EVENT = {
 };
 
 export const SERVER_SOCKET_EVENT = {
-  UPDATE_TYPING: "update_typing",
-  UPDATE_IN_ROOM: "update_in_room",
-  UPDATE_UNREAD_MESSAGE: "update_unread_message",
-  NEW_MESSAGE: "newMessage",
-  ROOM_CREATED: "roomCreated",
+  VOTE: "vote",
+  NEW_VOTE: "new_vote",
+  POLL: "poll",
+  NEW_POLL: "new_poll",
 };
 
 export const NEW_USER_WALLET = {
