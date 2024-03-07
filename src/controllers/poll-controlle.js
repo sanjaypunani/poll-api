@@ -58,7 +58,7 @@ const baseController = {
             },
           },
         ],
-        as: "myVotes",
+        as: "myVote",
       },
     });
 
@@ -79,7 +79,11 @@ const baseController = {
           let pollVoters = await Models.Votes.find(query);
           pollItems[j].voters = pollVoters;
         }
-        finalData.push({ ...data[i], pollItems });
+        finalData.push({
+          ...data[i],
+          pollItems,
+          myVote: data[i]?.myVote[0] || null,
+        });
       }
       res.send({
         success: true,
@@ -91,7 +95,6 @@ const baseController = {
 
   getPollbyId: async (req, res) => {
     const pollId = req.params.id;
-    console.log("pollId: ", pollId);
     let query = [];
     query.push({ $match: { _id: mongoose.Types.ObjectId(pollId) } });
     query.push({
@@ -140,7 +143,11 @@ const baseController = {
           let pollVoters = await Models.Votes.find(query);
           pollItems[j].voters = pollVoters;
         }
-        finalData.push({ ...data[i], pollItems, myVote: data[i]?.myVote[0] });
+        finalData.push({
+          ...data[i],
+          pollItems,
+          myVote: data[i]?.myVote[0] || null,
+        });
       }
       res.send({
         success: true,
