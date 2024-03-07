@@ -9,7 +9,7 @@ const baseController = {
       name: req.body.name,
       creator: req.user.id,
     };
-    const newPoll = new Models.Polls(req.body);
+    const newPoll = new Models.Polls(pollData);
     newPoll.save(async (saveErr, result) => {
       if (saveErr) {
         return res.status(412).send({
@@ -33,6 +33,8 @@ const baseController = {
 
   getAllPoll: async (req, res) => {
     let query = [];
+    console.log("req.user.id: ", req.user.id);
+
     query.push({ $match: { creator: mongoose.Types.ObjectId(req.user.id) } });
     query.push({
       $lookup: {
