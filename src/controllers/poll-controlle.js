@@ -43,14 +43,6 @@ const baseController = {
     query.push({
       $lookup: {
         from: "votes",
-        localField: "_id",
-        foreignField: "poll",
-        as: "allVotes",
-      },
-    });
-    query.push({
-      $lookup: {
-        from: "votes",
         let: { poll: "$_id" },
         pipeline: [
           {
@@ -68,12 +60,26 @@ const baseController = {
       },
     });
 
-    Models.Polls.aggregate(query, (err, data) => {
+    Models.Polls.aggregate(query, async (err, data) => {
       if (err) {
         res.send({ success: false, data, error: err });
         return;
       }
-      res.send({ success: true, data, message: "User pools success" });
+
+      let finalData = [];
+      for (let i = 0; i < data?.length; i++) {
+        let pollItems = data[i]?.pollItems;
+
+        for (let j = 0; j < pollItems.length; j++) {
+          let query = {
+            pollItem: { $eq: pollItems[j]?._id },
+          };
+          let pollVoters = await Models.Votes.find(query);
+          pollItems[j].voters = pollVoters;
+        }
+        finalData.push({ ...data[i], pollItems });
+      }
+      res.send({ success: true, finalData, message: "User pools success" });
     });
   },
 
