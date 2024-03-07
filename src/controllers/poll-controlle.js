@@ -79,7 +79,11 @@ const baseController = {
         }
         finalData.push({ ...data[i], pollItems });
       }
-      res.send({ success: true, finalData, message: "User pools success" });
+      res.send({
+        success: true,
+        data: finalData,
+        message: "User pools success",
+      });
     });
   },
 
