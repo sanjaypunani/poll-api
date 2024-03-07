@@ -119,7 +119,7 @@ const baseController = {
             },
           },
         ],
-        as: "myVotes",
+        as: "myVote",
       },
     });
 
@@ -140,7 +140,7 @@ const baseController = {
           let pollVoters = await Models.Votes.find(query);
           pollItems[j].voters = pollVoters;
         }
-        finalData.push({ ...data[i], pollItems });
+        finalData.push({ ...data[i], pollItems, myVote: data[i]?.myVote[0] });
       }
       res.send({
         success: true,
